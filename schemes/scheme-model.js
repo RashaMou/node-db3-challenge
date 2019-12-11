@@ -3,8 +3,8 @@ const db = require("../data/db-config");
 module.exports = {
   find,
   findById,
-  findSteps
-  // add,
+  findSteps,
+  add
   // update,
   // remove
 };
@@ -19,17 +19,6 @@ function findById(id) {
     .first();
 }
 
-/* 
-select s.id, 
-      s.step_number, 
-      s.instructions, 
-      sch.scheme_name 
-      from steps as s
-join schemes as sch 
-  on s.scheme_id = sch.id
-where s.scheme_id = 2
-*/
-
 function findSteps(schemeId) {
   return db("steps")
     .select(
@@ -40,4 +29,13 @@ function findSteps(schemeId) {
     )
     .join("schemes", "steps.scheme_id", "schemes.id")
     .where("steps.scheme_id", schemeId);
+}
+
+function add(scheme) {
+  return db("schemes")
+    .insert(scheme, "id")
+    .then(newId => {
+      const [id] = newId;
+      return findById(id);
+    });
 }
