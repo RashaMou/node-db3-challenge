@@ -14,9 +14,15 @@ function find() {
 }
 
 function findById(id) {
-  return db("schemes")
-    .where({ id })
-    .first();
+  return db("schemes").then(scheme => {
+    if (!id) {
+      return null;
+    } else {
+      return db("schemes")
+        .where({ id })
+        .first();
+    }
+  });
 }
 
 function findSteps(schemeId) {
@@ -52,16 +58,19 @@ function update(changes, id) {
 }
 
 function remove(id) {
-  const deletedItem = findById(id).then(item => {
-    return item;
-  });
-  console.log(deletedItem);
   return db("schemes")
     .where({ id })
-    .del()
-    .then(count => {
-      if (count > 0) {
-        return deletedItem;
+    .first()
+    .then(scheme => {
+      if (!scheme) {
+        return null;
+      } else {
+        return db("schemes")
+          .where({ id })
+          .del()
+          .then(() => {
+            return scheme;
+          });
       }
     });
 }
